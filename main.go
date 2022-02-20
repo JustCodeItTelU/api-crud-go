@@ -39,7 +39,7 @@ type Response struct {
 }
 
 func main() {
-	db, err = gorm.Open("mysql", "root:1235813@/db_jci?charset=utf8&parseTime=True")
+	db, err = gorm.Open("mysql", "root:password@/db_jci?charset=utf8&parseTime=True")
 
 	if err != nil {
 		log.Println("Connection Failed", err)
