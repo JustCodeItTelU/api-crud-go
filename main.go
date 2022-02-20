@@ -15,6 +15,11 @@ var db *gorm.DB
 var err error
 
 type Topic struct {
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+type Details struct {
 	ID       int         `json:"id"`
 	Title    string      `json:"title"`
 	Content  string      `json:"content"`
@@ -34,15 +39,15 @@ type Response struct {
 }
 
 func main() {
-	db, err = gorm.Open("mysql", "root:password@/db_jci?charset=utf8&parseTime=True")
+	db, err = gorm.Open("mysql", "root:1235813@/db_jci?charset=utf8&parseTime=True")
 
 	if err != nil {
 		log.Println("Connection Failed", err)
 	} else {
 		log.Println("Connected Success")
 	}
-	//db.AutoMigrate(&Topic{})
-	//db.AutoMigrate(&Comments{})
+	db.AutoMigrate(&Topic{})
+	db.AutoMigrate(&Comments{})
 
 	handleRequest()
 }
@@ -120,7 +125,7 @@ func getTopic(w http.ResponseWriter, r *http.Request) {
 	res := Response{
 		Code:    200,
 		Message: "Succes get Topic",
-		Data: Topic{
+		Data: Details{
 			ID:       topic.ID,
 			Title:    topic.Title,
 			Content:  topic.Content,
