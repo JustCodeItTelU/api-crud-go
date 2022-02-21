@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -39,7 +38,7 @@ type Response struct {
 }
 
 func main() {
-	db, err = gorm.Open("mysql", "root:password@/db_jci?charset=utf8&parseTime=True")
+	db, err = gorm.Open("mysql", "root:1235813@/db_jci?charset=utf8&parseTime=True")
 
 	if err != nil {
 		log.Println("Connection Failed", err)
@@ -202,11 +201,23 @@ func createComment(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(payloads, &comment)
 	vars := mux.Vars(r)
 	topicID := vars["id"]
+
 	//var topic Topic
 
 	db.Exec("INSERT INTO comments (comment, id_topic) VALUES ('" + comment.Comment + "'," + topicID + ")")
+	res := Response{
+		Code:    200,
+		Message: "Success Create Comment",
+		Data:    comment.Comment,
+	}
+	response, err := json.Marshal(res)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 }
 func updateComment(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -219,14 +230,22 @@ func updateComment(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(payloads, &commentUpdates)
 
-	s := db.Exec("UPDATE comments SET comment = '" + commentUpdates.Comment + "' WHERE id = " + commentId + " AND " + "id_topic = " + topicId)
-	fmt.Println(s)
+	db.Exec("UPDATE comments SET comment = '" + commentUpdates.Comment + "' WHERE id = " + commentId + " AND " + "id_topic = " + topicId)
+
+	res := Response{
+		Code:    200,
+		Message: "Success Create Comment",
+		Data:    commentUpdates.Comment,
+	}
+	response, err := json.Marshal(res)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 
 }
 func deleteComment(w http.ResponseWriter, r *http.Request) {
@@ -235,7 +254,17 @@ func deleteComment(w http.ResponseWriter, r *http.Request) {
 	commentId := vars["id_comment"]
 
 	db.Exec("DELETE FROM comments WHERE id = " + commentId + " AND " + "id_topic = " + topicId)
+	res := Response{
+		Code:    200,
+		Message: "Success Delete Comment",
+	}
+	response, err := json.Marshal(res)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 
 }
